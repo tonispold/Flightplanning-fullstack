@@ -37,7 +37,7 @@ const SeatMap: React.FC = () => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(4, 40px)", // Adjust for 10 columns in the grid
+          gridTemplateColumns: "repeat(4, 35px)", // Adjust for 10 columns in the grid
           gap: "5px",
           marginTop: "20px",
         }}
