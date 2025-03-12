@@ -2,6 +2,17 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Flight } from "../types";
+import { textFieldStyles } from "../styles";
+import { numberFieldStyles } from "../styles";
+import {
+  Box,
+  TextField,
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  Button,
+} from "@mui/material";
 
 const FlightList: React.FC = () => {
   const [flights, setFlights] = useState<Flight[]>([]);
@@ -15,22 +26,19 @@ const FlightList: React.FC = () => {
   const [destinationFilter, setDestinationFilter] = useState<string>("");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [priceFilter, setPriceFilter] = useState<string>("");
-  const [maxDurationFilter, setMaxDurationFilter] = useState<string>(""); // New flight duration filter
+  const [maxDurationFilter, setMaxDurationFilter] = useState<string>("");
 
-  // Fetch flights from the backend
+  // Fetch flights
   useEffect(() => {
     const fetchFlights = async () => {
       try {
         const response = await axios.get<Flight[]>(
           "http://localhost:8080/api/flights"
         );
-
-        // Convert flightDate strings to Date objects
         const formattedFlights = response.data.map((flight) => ({
           ...flight,
           flightDate: new Date(flight.flightDate),
         }));
-
         setFlights(formattedFlights);
         setFilteredFlights(formattedFlights);
       } catch (error) {
@@ -39,24 +47,26 @@ const FlightList: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchFlights();
   }, []);
 
-  // Function to format the date as YYYY-MM-DD
-  const formatDate = (date: Date) => {
-    return date.toISOString().split("T")[0]; // Extract YYYY-MM-DD
-  };
+  // Function to format the date
+  const formatDate = (date: Date) => date.toISOString().split("T")[0];
 
-  // Convert "2h 30m" to total minutes (e.g., "2h 30m" => 150 minutes)
+  // Convert duration to total minutes
   const convertDurationToMinutes = (duration: string): number => {
     const hoursMatch = duration.match(/(\d+)h/);
     const minutesMatch = duration.match(/(\d+)m/);
-
-    const hours = hoursMatch ? parseInt(hoursMatch[1]) * 60 : 0; // Convert hours to minutes
+    const hours = hoursMatch ? parseInt(hoursMatch[1]) * 60 : 0;
     const minutes = minutesMatch ? parseInt(minutesMatch[1]) : 0;
-
     return hours + minutes;
+  };
+
+  const clearFilters = () => {
+    setDestinationFilter("");
+    setDateFilter("");
+    setPriceFilter("");
+    setMaxDurationFilter("");
   };
 
   // Auto-refresh filters on every input change
@@ -84,7 +94,7 @@ const FlightList: React.FC = () => {
     }
 
     if (maxDurationFilter) {
-      const maxMinutes = parseInt(maxDurationFilter) * 60; // Convert hours to minutes
+      const maxMinutes = parseInt(maxDurationFilter) * 60;
       filtered = filtered.filter(
         (flight) =>
           convertDurationToMinutes(flight.flightDuration) <= maxMinutes
@@ -94,72 +104,122 @@ const FlightList: React.FC = () => {
     setFilteredFlights(filtered);
   }, [destinationFilter, dateFilter, priceFilter, maxDurationFilter, flights]);
 
-  if (loading) return <div>Loading flights...</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) return <Typography>Loading flights...</Typography>;
+  if (error) return <Typography color="error">{error}</Typography>;
 
   // Handle flight selection
   const handleFlightClick = (flightId: number) => {
-    navigate(`/seatmap/${flightId}`); // Open seat map page in the same tab
+    navigate(`/seatmap/${flightId}`);
   };
 
   return (
-    <div>
-      <h2>Available Flights</h2>
+    <Box p={3}>
+      <Typography variant="h4" gutterBottom>
+        Available Flights
+      </Typography>
 
-      {/* Filter Form */}
-      <div className="filter-form">
-        <input
-          type="text"
-          placeholder="Filter by destination"
-          value={destinationFilter}
-          onChange={(e) => setDestinationFilter(e.target.value)}
-        />
-        <input
-          type="date"
-          value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Max Price"
-          value={priceFilter}
-          onChange={(e) => setPriceFilter(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Max Duration (hours)"
-          value={maxDurationFilter}
-          onChange={(e) => setMaxDurationFilter(e.target.value)}
-        />
-      </div>
+      {/* Filter Inputs */}
+      <Grid container spacing={2} mb={3}>
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            id="outlined-basic"
+            label="Destination"
+            variant="outlined"
+            sx={textFieldStyles}
+            fullWidth
+            value={destinationFilter}
+            onChange={(e) => setDestinationFilter(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            id="outlined-basic"
+            label="Flight Date"
+            type="date"
+            variant="outlined"
+            sx={textFieldStyles}
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="custom-date-field"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            id="outlined-basic"
+            label="Max Price ($)"
+            type="number"
+            variant="outlined"
+            sx={{
+              ...textFieldStyles,
+              ...numberFieldStyles,
+            }}
+            fullWidth
+            value={priceFilter}
+            onChange={(e) => setPriceFilter(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            id="outlined-basic"
+            label="Max Duration (hours)"
+            type="number"
+            variant="outlined"
+            sx={{
+              ...textFieldStyles,
+              ...numberFieldStyles,
+            }}
+            fullWidth
+            value={maxDurationFilter}
+            onChange={(e) => setMaxDurationFilter(e.target.value)}
+          />
+        </Grid>
+        <Grid container justifyContent="flex-end" mt={1}>
+          <Button variant="outlined" onClick={clearFilters}>
+            Clear Filters
+          </Button>
+        </Grid>
+      </Grid>
 
-      {/* Display filtered flight data */}
-      <ul>
+      {/* Display Flights */}
+      <Grid container spacing={2}>
         {filteredFlights.map((flight) => (
-          <li
-            key={flight.id}
-            className="flight-item"
-            onClick={() => handleFlightClick(flight.id)} // Clickable flight
-          >
-            <p>
-              <strong>Departure:</strong> {flight.departure}
-            </p>
-            <p>
-              <strong>Destination:</strong> {flight.destination}
-            </p>
-            <p>
-              <strong>Flight Date:</strong> {formatDate(flight.flightDate)}
-            </p>
-            <p>
-              <strong>Flight Duration:</strong> {flight.flightDuration}
-            </p>
-            <p>
-              <strong>Price:</strong> ${flight.price}
-            </p>
-          </li>
+          <Grid item xs={12} sm={6} md={4} key={flight.id}>
+            <Card
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: "100%",
+                cursor: "pointer",
+                transition: "transform 0.2s",
+                "&:hover": { transform: "scale(1.02)" },
+              }}
+              onClick={() => handleFlightClick(flight.id)}
+            >
+              <CardContent>
+                <Typography variant="h6">
+                  {flight.departure} → {flight.destination}
+                </Typography>
+                <Typography color="textSecondary">
+                  <strong>Date:</strong> {formatDate(flight.flightDate)}
+                </Typography>
+                <Typography color="textSecondary">
+                  <strong>Duration:</strong> {flight.flightDuration}
+                </Typography>
+                <Typography color="textSecondary">
+                  <strong>Price:</strong> ${flight.price}
+                </Typography>
+              </CardContent>
+              <Box textAlign="center" pb={2}>
+                <Button variant="contained">Select Flight</Button>
+              </Box>
+            </Card>
+          </Grid>
         ))}
-      </ul>
-    </div>
+      </Grid>
+    </Box>
   );
 };
 
