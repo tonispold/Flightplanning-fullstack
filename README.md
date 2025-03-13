@@ -1,31 +1,36 @@
-<h1> Full-Stack Flight Planner ✈️ </h1>
+# Full-Stack Flight Planner ✈️ #
 
-This is a full-stack flight planning app built with:
-<bold>Backend</bold>: Spring Boot (Java) + MySQL
-<bold>Frontend</bold>: React (Vite) + MUI
-Database: MySQL 8
-Containerized with Docker & Docker Compose
+This is a **full-stack flight planning app** built with:
 
-<h2> 🚀 How to Run the App </h2>
+**Backend**: Spring Boot (Java) + MySQL
+<br>
+**Frontend**: React (Vite) + MUI
+<br>
+**Database**: MySQL 8
+<br>
+**Containerized with Docker & Docker Compose**
 
-<bold>1. Install Dependencies</bold>
-Install Docker & Docker Compose:
-Download Docker
-Ensure Docker Desktop is running
+## 🚀 How to Run the App ##
 
-<bold>2. Clone the Repository</bold>
-git clone <your-github-repo-url>
-cd <your-repo-folder>
+**1. Install Dependencies**
+- Install Docker & Docker Compose:
+- Download Docker
+- Ensure Docker Desktop is running
 
-<bold>3. Run the Application</bold>
-docker-compose up --build
+**2. Clone the Repository**
+- git clone https://github.com/tonispold/Flightplanning-fullstack
+- cd Flightplanning-fullstack
 
-<bold>This will:</bold>
-Start a MySQL database (flight_db)
-Start the backend (Spring Boot)
-Start the frontend (React with Vite)
+**3. Run the Application**
+- docker-compose up --build
 
-<bold>4. Open the Web App</bold>
+**This will:**
+- Start a MySQL database (flight_db)
+- Start the backend (Spring Boot)
+- Start the frontend (React with Vite)
+
+**4. Open the Web App**
+
 Once running, open:
-Frontend: http://localhost:5173
-Backend API: http://localhost:8080/api/flights
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8080/api/flights
