@@ -49,7 +49,7 @@ const SeatMap: React.FC = () => {
 
   const seatCount = 60;
 
-  // Fetch flight data including seat price
+  // Fetch flight data
   useEffect(() => {
     axios
       .get(`http://localhost:8080/api/flights/${id}`)
@@ -71,7 +71,7 @@ const SeatMap: React.FC = () => {
     }));
   };
 
-  // Seat recommendation logic
+  // Seat recommendation
   const recommendSeats = () => {
     if (!flight) return;
 
@@ -82,7 +82,7 @@ const SeatMap: React.FC = () => {
     ).filter((seat) => !bookedSeats.has(seat));
 
     if (availableSeats.length < tickets) {
-      setOpenErrorModal(true); // Open the modal
+      setOpenErrorModal(true);
       setRecommendedSeats([]);
       return;
     }
@@ -115,10 +115,10 @@ const SeatMap: React.FC = () => {
     // Remove duplicates from multiple filters
     filteredSeats = Array.from(new Set(filteredSeats));
 
-    // Step 1: Recommend all available filtered seats first
+    // First recommend all available filtered seats first
     let recommended: number[] = filteredSeats.slice(0, tickets);
 
-    // Step 2: If not enough, find adjacent free seats
+    // Then if there aren't any seats left based on the filters, find adjacent free seats
     if (recommended.length < tickets) {
       const remainingSeats = availableSeats.filter(
         (seat) => !recommended.includes(seat)
@@ -186,14 +186,12 @@ const SeatMap: React.FC = () => {
         justifyContent="space-between"
         p={2}
       >
-        {/* Seat Map Section */}
         <Box flex={1}>
           <Typography variant="h5">
             Flight from {flight.departure} to {flight.destination} on{" "}
             {flight.flightDate}
           </Typography>
 
-          {/* Ticket Input & Filters */}
           <Box display="flex" alignItems="center" gap={2} mt={2}>
             <TextField
               id="outlined-basic"
@@ -241,7 +239,11 @@ const SeatMap: React.FC = () => {
           </Box>
 
           <Box display="flex" gap={2} mt={2}>
-            <Button variant="outlined" className="clear-filters-btn" onClick={clearSeatFilters}>
+            <Button
+              variant="outlined"
+              className="clear-filters-btn"
+              onClick={clearSeatFilters}
+            >
               Clear Filters
             </Button>
           </Box>
@@ -260,11 +262,11 @@ const SeatMap: React.FC = () => {
 
               return (
                 <React.Fragment key={rowIndex}>
-                  {/* Add extra gap before seats 29-32 */}
+                  {/* Row 29-32 has extra leg space, so add gap */}
                   {baseSeat === 29 && <Grid item xs={12} sx={{ height: 20 }} />}
 
                   <Grid container item spacing={1}>
-                    {/* Left side (Seats 1 & 2) */}
+                    {/* Left side seats */}
                     {[0, 1].map((offset) => {
                       const seat = baseSeat + offset;
                       const isBooked = flight.bookedSeats.includes(seat);
@@ -290,7 +292,7 @@ const SeatMap: React.FC = () => {
                                 : isRecommended
                                 ? "yellow"
                                 : isBusinessClass
-                                ? "lightblue" // Business class seats in blue
+                                ? "lightblue"
                                 : "white",
                               color: isBooked ? "white" : "black",
                               border: "1px solid gray",
@@ -303,10 +305,10 @@ const SeatMap: React.FC = () => {
                       );
                     })}
 
-                    {/* Aisle (Gap between columns 2 and 3) */}
+                    {/* Aisle */}
                     <Grid item sx={{ width: 20 }} />
 
-                    {/* Right side (Seats 3 & 4) */}
+                    {/* Right side seats */}
                     {[2, 3].map((offset) => {
                       const seat = baseSeat + offset;
                       const isBooked = flight.bookedSeats.includes(seat);
@@ -351,7 +353,7 @@ const SeatMap: React.FC = () => {
           </Grid>
         </Box>
 
-        {/* Selected Seats & Total Price Section */}
+        {/* Selected seats & total price section */}
         <Paper sx={{ width: 250, p: 2, ml: 3 }}>
           <Typography variant="h6">Selected Seats</Typography>
           {selectedSeats.length === 0 ? (

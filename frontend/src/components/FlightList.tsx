@@ -133,7 +133,6 @@ const FlightList: React.FC = () => {
         Available Flights
       </Typography>
 
-      {/* Filter Inputs */}
       <Grid container spacing={2} mb={3}>
         <Grid item xs={12} sm={6} md={3}>
           <TextField
@@ -207,7 +206,6 @@ const FlightList: React.FC = () => {
         </Grid>
       </Grid>
 
-      {/* Display Flights */}
       <Grid container spacing={2}>
         {filteredFlights.map((flight) => (
           <Grid item xs={12} sm={6} md={4} key={flight.id}>
@@ -236,14 +234,12 @@ const FlightList: React.FC = () => {
                   <strong>Duration:</strong> {flight.flightDuration}
                 </Typography>
 
-                {/* Only display stopover if it exists */}
                 {flight.stopover && (
                   <Typography color="textSecondary">
                     <strong>Stopover:</strong> {flight.stopover}
                   </Typography>
                 )}
 
-                {/* Display business and economy class prices */}
                 <Typography color="textSecondary">
                   <strong>Business Class Price:</strong> ${flight.priceBusiness}
                 </Typography>

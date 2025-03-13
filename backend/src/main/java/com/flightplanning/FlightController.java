@@ -6,7 +6,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/flights")
-@CrossOrigin(origins = "http://localhost:5173") // Adjust based on frontend port
+@CrossOrigin(origins = "http://localhost:5173")
 public class FlightController {
 
     private final FlightRepository flightRepository;
@@ -15,13 +15,13 @@ public class FlightController {
         this.flightRepository = flightRepository;
     }
 
-    // ✅ Get all flights
+    // Get all flights
     @GetMapping
     public List<Flight> getFlights() {
         return flightRepository.findAll();
     }
 
-    // ✅ Get a specific flight by ID
+    // Get a specific flight by ID
     @GetMapping("/{id}")
     public ResponseEntity<Flight> getFlightById(@PathVariable Long id) {
         Optional<Flight> optionalFlight = flightRepository.findById(id);
