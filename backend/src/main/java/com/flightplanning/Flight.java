@@ -14,6 +14,8 @@ public class Flight {
     private Date flightDate;
     private String flightDuration;
     private double price;
+    private String stopover;
+    private double priceBusiness;
 
     @ElementCollection
     @CollectionTable(name = "flight_booked_seats", joinColumns = @JoinColumn(name = "flight_id"))
@@ -74,5 +76,21 @@ public class Flight {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public String getStopover() {
+        return this.stopover;
+    }
+
+    public void setStopover(String stopover) {
+        this.stopover = stopover;
+    }
+
+    public double getPriceBusiness() {
+        return this.priceBusiness;
+    }
+
+    public void setPriceBusiness(double priceBusiness) {
+        this.priceBusiness = priceBusiness;
     }
 }

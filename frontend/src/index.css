@@ -27,7 +27,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-image: linear-gradient(150deg, #cb5eee7a 0%, #4be1ec61 80%);
+  background-image: linear-gradient(150deg, #cb5eee7a 0%, #4be1ec61 100%);
 }
 
 .custom-date-field input[type="date"]::-webkit-calendar-picker-indicator {
@@ -49,6 +49,7 @@ h4, h5 {
 
 .css-19kzrtu {
   padding-top: 200px !important;
+  max-width: 1400px;
 }
 
 .css-1rr4qq7 {
@@ -62,6 +63,10 @@ h4, h5 {
 
 .css-169hnpe-MuiFormControl-root-MuiTextField-root input[type='number'] {
   width: 153px;
+}
+
+.css-m3jaqj-MuiGrid-root {
+  flex-direction: column !important;
 }
 
 .css-1r9i4v {
@@ -116,4 +121,36 @@ button:hover {
   button {
     background-color: #f9f9f9;
   }
+}
+
+@media only screen and (max-width: 1024px) {
+  .responsive-box {
+    flex-wrap: wrap;
+    max-width: 70%;
+    margin: auto;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .responsive-box {
+    flex-wrap: wrap;
+    max-width: 50%;
+    margin: auto;
+    justify-content: center !important;
+  }
+
+  .css-16xl4zq-MuiTypography-root {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .css-19k4zfs, .css-19opgx6-MuiFormControlLabel-root, .css-k008qs {
+    justify-content: center;
+  }
+
+  .clear-filters-btn {
+    width: 180px;
+    margin: auto !important;
+  }
+
 }

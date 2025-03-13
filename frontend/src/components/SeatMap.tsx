@@ -13,12 +13,17 @@ import {
   Box,
   Grid,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 
 interface Flight {
   id: number;
   bookedSeats: number[];
   seatPrice: number;
+  businessSeatPrice: number;
   departure: String;
   destination: String;
   flightDate: String;
@@ -29,9 +34,13 @@ const SeatMap: React.FC = () => {
   const [flight, setFlight] = useState<Flight | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [seatPrice, setSeatPrice] = useState<number | null>(null);
+  const [seatBusinessSeatPrice, setBusinessSeatPrice] = useState<number | null>(
+    null
+  );
   const [tickets, setTickets] = useState<number>(1);
   const [recommendedSeats, setRecommendedSeats] = useState<number[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
+  const [openErrorModal, setOpenErrorModal] = useState(false);
   const [filters, setFilters] = useState({
     windowSeat: false,
     moreLegSpace: false,
@@ -47,6 +56,7 @@ const SeatMap: React.FC = () => {
       .then((response) => {
         setFlight(response.data);
         setSeatPrice(response.data.price);
+        setBusinessSeatPrice(response.data.priceBusiness);
       })
       .catch(() => {
         setError("Flight not found.");
@@ -72,7 +82,7 @@ const SeatMap: React.FC = () => {
     ).filter((seat) => !bookedSeats.has(seat));
 
     if (availableSeats.length < tickets) {
-      setError("Too many tickets, not enough seats available.");
+      setOpenErrorModal(true); // Open the modal
       setRecommendedSeats([]);
       return;
     }
@@ -170,7 +180,12 @@ const SeatMap: React.FC = () => {
         </Button>
       </Box>
 
-      <Box display="flex" justifyContent="space-between" p={2}>
+      <Box
+        className="responsive-box"
+        display="flex"
+        justifyContent="space-between"
+        p={2}
+      >
         {/* Seat Map Section */}
         <Box flex={1}>
           <Typography variant="h5">
@@ -226,7 +241,7 @@ const SeatMap: React.FC = () => {
           </Box>
 
           <Box display="flex" gap={2} mt={2}>
-            <Button variant="outlined" onClick={clearSeatFilters}>
+            <Button variant="outlined" className="clear-filters-btn" onClick={clearSeatFilters}>
               Clear Filters
             </Button>
           </Box>
@@ -255,6 +270,7 @@ const SeatMap: React.FC = () => {
                       const isBooked = flight.bookedSeats.includes(seat);
                       const isRecommended = recommendedSeats.includes(seat);
                       const isSelected = selectedSeats.includes(seat);
+                      const isBusinessClass = seat >= 1 && seat <= 12;
 
                       return (
                         <Grid item key={seat}>
@@ -273,6 +289,8 @@ const SeatMap: React.FC = () => {
                                 ? "green"
                                 : isRecommended
                                 ? "yellow"
+                                : isBusinessClass
+                                ? "lightblue" // Business class seats in blue
                                 : "white",
                               color: isBooked ? "white" : "black",
                               border: "1px solid gray",
@@ -294,6 +312,7 @@ const SeatMap: React.FC = () => {
                       const isBooked = flight.bookedSeats.includes(seat);
                       const isRecommended = recommendedSeats.includes(seat);
                       const isSelected = selectedSeats.includes(seat);
+                      const isBusinessClass = seat >= 1 && seat <= 12;
 
                       return (
                         <Grid item key={seat}>
@@ -312,6 +331,8 @@ const SeatMap: React.FC = () => {
                                 ? "green"
                                 : isRecommended
                                 ? "yellow"
+                                : isBusinessClass
+                                ? "lightblue"
                                 : "white",
                               color: isBooked ? "white" : "black",
                               border: "1px solid gray",
@@ -337,15 +358,47 @@ const SeatMap: React.FC = () => {
             <Typography>No seats selected</Typography>
           ) : (
             <Box mt={1}>
-              {selectedSeats.map((seat) => (
-                <Typography key={seat}>Seat {seat}</Typography>
-              ))}
+              {selectedSeats.map((seat) => {
+                const isBusinessClass = seat >= 1 && seat <= 12;
+                const seatPriceToShow = isBusinessClass
+                  ? seatBusinessSeatPrice
+                  : seatPrice;
+
+                return (
+                  <Typography key={seat}>
+                    Seat {seat} - ${seatPriceToShow}
+                  </Typography>
+                );
+              })}
+
               <Typography variant="h6" mt={2}>
-                Total: ${selectedSeats.length * (seatPrice ?? 0)}
+                Total: $
+                {selectedSeats.reduce((total, seat) => {
+                  const isBusinessClass = seat >= 1 && seat <= 12;
+                  return (
+                    total +
+                    (isBusinessClass
+                      ? seatBusinessSeatPrice ?? 0
+                      : seatPrice ?? 0)
+                  );
+                }, 0)}
               </Typography>
             </Box>
           )}
         </Paper>
+        <Dialog open={openErrorModal} onClose={() => setOpenErrorModal(false)}>
+          <DialogTitle>Error</DialogTitle>
+          <DialogContent>
+            <Typography color="error">
+              Too many tickets, not enough seats available.
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenErrorModal(false)} color="primary">
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Box>
   );

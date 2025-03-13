@@ -23,6 +23,7 @@ const FlightList: React.FC = () => {
   const navigate = useNavigate();
 
   // Filter states
+  const [departureFilter, setDepartureFilter] = useState<string>("");
   const [destinationFilter, setDestinationFilter] = useState<string>("");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [priceFilter, setPriceFilter] = useState<string>("");
@@ -63,6 +64,7 @@ const FlightList: React.FC = () => {
   };
 
   const clearFilters = () => {
+    setDepartureFilter("");
     setDestinationFilter("");
     setDateFilter("");
     setPriceFilter("");
@@ -72,6 +74,12 @@ const FlightList: React.FC = () => {
   // Auto-refresh filters on every input change
   useEffect(() => {
     let filtered = [...flights];
+
+    if (departureFilter) {
+      filtered = filtered.filter((flight) =>
+        flight.departure.toLowerCase().includes(departureFilter.toLowerCase())
+      );
+    }
 
     if (destinationFilter) {
       filtered = filtered.filter((flight) =>
@@ -102,7 +110,14 @@ const FlightList: React.FC = () => {
     }
 
     setFilteredFlights(filtered);
-  }, [destinationFilter, dateFilter, priceFilter, maxDurationFilter, flights]);
+  }, [
+    departureFilter,
+    destinationFilter,
+    dateFilter,
+    priceFilter,
+    maxDurationFilter,
+    flights,
+  ]);
 
   if (loading) return <Typography>Loading flights...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
@@ -122,7 +137,18 @@ const FlightList: React.FC = () => {
       <Grid container spacing={2} mb={3}>
         <Grid item xs={12} sm={6} md={3}>
           <TextField
-            id="outlined-basic"
+            id="departure-filter"
+            label="Departure"
+            variant="outlined"
+            sx={textFieldStyles}
+            fullWidth
+            value={departureFilter}
+            onChange={(e) => setDepartureFilter(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            id="destination-filter"
             label="Destination"
             variant="outlined"
             sx={textFieldStyles}
@@ -133,7 +159,7 @@ const FlightList: React.FC = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <TextField
-            id="outlined-basic"
+            id="date-filter"
             label="Flight Date"
             type="date"
             variant="outlined"
@@ -142,12 +168,11 @@ const FlightList: React.FC = () => {
             InputLabelProps={{ shrink: true }}
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="custom-date-field"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <TextField
-            id="outlined-basic"
+            id="price-filter"
             label="Max Price ($)"
             type="number"
             variant="outlined"
@@ -162,7 +187,7 @@ const FlightList: React.FC = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <TextField
-            id="outlined-basic"
+            id="duration-filter"
             label="Max Duration (hours)"
             type="number"
             variant="outlined"
@@ -200,7 +225,9 @@ const FlightList: React.FC = () => {
             >
               <CardContent>
                 <Typography variant="h6">
-                  {flight.departure} → {flight.destination}
+                  {flight.departure} →{" "}
+                  {flight.stopover ? `${flight.stopover} → ` : ""}
+                  {flight.destination}
                 </Typography>
                 <Typography color="textSecondary">
                   <strong>Date:</strong> {formatDate(flight.flightDate)}
@@ -208,10 +235,23 @@ const FlightList: React.FC = () => {
                 <Typography color="textSecondary">
                   <strong>Duration:</strong> {flight.flightDuration}
                 </Typography>
+
+                {/* Only display stopover if it exists */}
+                {flight.stopover && (
+                  <Typography color="textSecondary">
+                    <strong>Stopover:</strong> {flight.stopover}
+                  </Typography>
+                )}
+
+                {/* Display business and economy class prices */}
                 <Typography color="textSecondary">
-                  <strong>Price:</strong> ${flight.price}
+                  <strong>Business Class Price:</strong> ${flight.priceBusiness}
+                </Typography>
+                <Typography color="textSecondary">
+                  <strong>Economy Class Price:</strong> ${flight.price}
                 </Typography>
               </CardContent>
+
               <Box textAlign="center" pb={2}>
                 <Button variant="contained">Select Flight</Button>
               </Box>
