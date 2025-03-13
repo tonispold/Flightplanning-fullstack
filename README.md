@@ -13,8 +13,7 @@ This is a **full-stack flight planning app** built with:
 ## 🚀 How to Run the App ##
 
 **1. Install Dependencies**
-- Install Docker & Docker Compose:
-- Download Docker
+- Download [Docker](https://docs.docker.com/get-started/get-docker/)
 - Ensure Docker Desktop is running
 
 **2. Clone the Repository**
