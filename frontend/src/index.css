@@ -34,8 +34,14 @@ body {
   filter: invert(1);
 }
 
-.css-19opgx6-MuiFormControlLabel-root .MuiFormControlLabel-label {
+.seat-filters {
   color: white;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.clear-filters-box {
+  margin-bottom: 20px;
 }
 
 h1 {
@@ -47,53 +53,45 @@ h4, h5 {
   color: white;
 }
 
-.css-19kzrtu {
+.content-box {
   padding-top: 200px !important;
   padding-bottom: 100px !important;
   max-width: 1400px;
 }
 
-.css-1rr4qq7 {
+.settings-box {
   margin: auto 0;
 }
 
-.css-y0u0hj {
+.responsive-box {
   padding-top: 50px !important;
   gap: 100px;
+  padding-bottom: 100px !important;
 }
 
-.css-169hnpe-MuiFormControl-root-MuiTextField-root input[type='number'] {
+.ticket-textfield {
   width: 153px;
 }
 
-.css-m3jaqj-MuiGrid-root {
-  flex-direction: column !important;
-}
-
-.css-1r9i4v {
-  flex-direction: column;
-  margin-bottom: 20px;
-}
-
-.css-17kt6xd-MuiPaper-root {
+.paper-price {
   margin-left: 0px !important;
   height: 100%;
   margin: auto 0;
 }
 
-.css-16xl4zq-MuiTypography-root {
+.header-text {
   max-width: 218px;
   margin-bottom: 60px !important;
-}
-
-.css-1blvszr-MuiButtonBase-root-MuiButton-root {
-  width: 150px;
 }
 
 .back-button {
   transform: translateY(50px);
   margin-left: 17px !important;
   width: 181px;
+}
+
+.seat-display {
+  justify-content: center;
 }
 
 button {
@@ -109,6 +107,10 @@ button {
 }
 button:hover {
   border-color: #646cff;
+}
+
+.clear-filters-btn {
+  background-color: #b863c6 !important;
 }
 
 @media (prefers-color-scheme: light) {
@@ -132,7 +134,7 @@ button:hover {
   }
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 800px) {
   .responsive-box {
     flex-wrap: wrap;
     max-width: 50%;
@@ -140,13 +142,17 @@ button:hover {
     justify-content: center !important;
   }
 
-  .css-16xl4zq-MuiTypography-root {
+  .header-text {
     max-width: 100%;
     text-align: center;
   }
 
-  .css-19k4zfs, .css-19opgx6-MuiFormControlLabel-root, .css-k008qs {
+  .ticket-box, .center {
     justify-content: center;
+  }
+  
+  .recommend-seats-btn {
+    margin: auto !important;
   }
 
   .clear-filters-btn {

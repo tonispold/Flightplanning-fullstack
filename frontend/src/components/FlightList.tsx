@@ -10,16 +10,15 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
   Button,
 } from "@mui/material";
+import Grid2 from "@mui/material/Grid2";
 
 const FlightList: React.FC = () => {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [filteredFlights, setFilteredFlights] = useState<Flight[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
   const navigate = useNavigate();
 
   // Filter states
@@ -43,6 +42,7 @@ const FlightList: React.FC = () => {
         setFlights(formattedFlights);
         setFilteredFlights(formattedFlights);
       } catch (error) {
+        console.error("Error fetching flights data", error);
         setError("Error fetching flights data");
       } finally {
         setLoading(false);
@@ -128,13 +128,27 @@ const FlightList: React.FC = () => {
   };
 
   return (
-    <Box p={3}>
+    <Box className="content-box" p={3}>
       <Typography variant="h4" gutterBottom>
         Available Flights
       </Typography>
 
-      <Grid container spacing={2} mb={3}>
-        <Grid item xs={12} sm={6} md={3}>
+      <Grid2
+        container
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(12, 1fr)",
+          gap: 2,
+          mb: 3,
+        }}
+      >
+        <Grid2
+          sx={{
+            gridColumn: "span 12",
+            "@media (min-width:600px)": { gridColumn: "span 6" },
+            "@media (min-width:960px)": { gridColumn: "span 3" },
+          }}
+        >
           <TextField
             id="departure-filter"
             label="Departure"
@@ -144,8 +158,14 @@ const FlightList: React.FC = () => {
             value={departureFilter}
             onChange={(e) => setDepartureFilter(e.target.value)}
           />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        </Grid2>
+        <Grid2
+          sx={{
+            gridColumn: "span 12",
+            "@media (min-width:600px)": { gridColumn: "span 6" },
+            "@media (min-width:960px)": { gridColumn: "span 3" },
+          }}
+        >
           <TextField
             id="destination-filter"
             label="Destination"
@@ -155,8 +175,14 @@ const FlightList: React.FC = () => {
             value={destinationFilter}
             onChange={(e) => setDestinationFilter(e.target.value)}
           />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        </Grid2>
+        <Grid2
+          sx={{
+            gridColumn: "span 12",
+            "@media (min-width:600px)": { gridColumn: "span 6" },
+            "@media (min-width:960px)": { gridColumn: "span 3" },
+          }}
+        >
           <TextField
             id="date-filter"
             label="Flight Date"
@@ -167,9 +193,16 @@ const FlightList: React.FC = () => {
             InputLabelProps={{ shrink: true }}
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
+            className="custom-date-field"
           />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        </Grid2>
+        <Grid2
+          sx={{
+            gridColumn: "span 12",
+            "@media (min-width:600px)": { gridColumn: "span 6" },
+            "@media (min-width:960px)": { gridColumn: "span 3" },
+          }}
+        >
           <TextField
             id="price-filter"
             label="Max Price ($)"
@@ -183,8 +216,14 @@ const FlightList: React.FC = () => {
             value={priceFilter}
             onChange={(e) => setPriceFilter(e.target.value)}
           />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        </Grid2>
+        <Grid2
+          sx={{
+            gridColumn: "span 12",
+            "@media (min-width:600px)": { gridColumn: "span 6" },
+            "@media (min-width:960px)": { gridColumn: "span 3" },
+          }}
+        >
           <TextField
             id="duration-filter"
             label="Max Duration (hours)"
@@ -198,17 +237,42 @@ const FlightList: React.FC = () => {
             value={maxDurationFilter}
             onChange={(e) => setMaxDurationFilter(e.target.value)}
           />
-        </Grid>
-        <Grid container justifyContent="flex-end" mt={1}>
-          <Button variant="outlined" onClick={clearFilters}>
+        </Grid2>
+        <Grid2
+          sx={{
+            gridColumn: "span 12",
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          <Button
+            className="clear-filters-btn"
+            variant="contained"
+            onClick={clearFilters}
+          >
             Clear Filters
           </Button>
-        </Grid>
-      </Grid>
+        </Grid2>
+      </Grid2>
 
-      <Grid container spacing={2}>
+      {/* Flights Grid */}
+      <Grid2
+        container
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(12, 1fr)",
+          gap: 2,
+        }}
+      >
         {filteredFlights.map((flight) => (
-          <Grid item xs={12} sm={6} md={4} key={flight.id}>
+          <Grid2
+            key={flight.id}
+            sx={{
+              gridColumn: "span 12",
+              "@media (min-width:600px)": { gridColumn: "span 6" },
+              "@media (min-width:960px)": { gridColumn: "span 4" },
+            }}
+          >
             <Card
               sx={{
                 display: "flex",
@@ -224,7 +288,7 @@ const FlightList: React.FC = () => {
               <CardContent>
                 <Typography variant="h6">
                   {flight.departure} →{" "}
-                  {flight.stopover ? `${flight.stopover} → ` : ""}
+                  {flight.stopover ? `${flight.stopover} → ` : ""}{" "}
                   {flight.destination}
                 </Typography>
                 <Typography color="textSecondary">
@@ -233,13 +297,11 @@ const FlightList: React.FC = () => {
                 <Typography color="textSecondary">
                   <strong>Duration:</strong> {flight.flightDuration}
                 </Typography>
-
                 {flight.stopover && (
                   <Typography color="textSecondary">
                     <strong>Stopover:</strong> {flight.stopover}
                   </Typography>
                 )}
-
                 <Typography color="textSecondary">
                   <strong>Business Class Price:</strong> ${flight.priceBusiness}
                 </Typography>
@@ -247,14 +309,13 @@ const FlightList: React.FC = () => {
                   <strong>Economy Class Price:</strong> ${flight.price}
                 </Typography>
               </CardContent>
-
               <Box textAlign="center" pb={2}>
                 <Button variant="contained">Select Flight</Button>
               </Box>
             </Card>
-          </Grid>
+          </Grid2>
         ))}
-      </Grid>
+      </Grid2>
     </Box>
   );
 };

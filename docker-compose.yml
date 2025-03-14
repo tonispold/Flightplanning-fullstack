@@ -1,15 +1,19 @@
 version: "3.8"
 services:
   mysql:
+    container_name: mysql
     image: mysql:8
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: root
+      MYSQL_DATABASE: flight_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     ports:
       - "3307:3306"
 
   backend:
+    container_name: backend
     build: ./backend
     ports:
       - "8080:8080"
@@ -20,6 +24,15 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/flight_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      VITE_BACKEND_URL: http://localhost:8080/
 
 networks:
   app-network:

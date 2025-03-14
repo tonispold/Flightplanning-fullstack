@@ -11,22 +11,22 @@ import {
   Button,
   Typography,
   Box,
-  Grid,
   Paper,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import Grid2 from "@mui/material/Grid2";
 
 interface Flight {
   id: number;
   bookedSeats: number[];
   seatPrice: number;
   businessSeatPrice: number;
-  departure: String;
-  destination: String;
-  flightDate: String;
+  departure: string;
+  destination: string;
+  flightDate: string;
 }
 
 const SeatMap: React.FC = () => {
@@ -76,7 +76,7 @@ const SeatMap: React.FC = () => {
     if (!flight) return;
 
     const bookedSeats = new Set(flight.bookedSeats);
-    let availableSeats = Array.from(
+    const availableSeats = Array.from(
       { length: seatCount },
       (_, i) => i + 1
     ).filter((seat) => !bookedSeats.has(seat));
@@ -89,34 +89,36 @@ const SeatMap: React.FC = () => {
 
     let filteredSeats: number[] = [];
 
+    const MORE_LEG_SPACE_SEATS = [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 29, 30, 31, 32,
+    ];
+
+    const WINDOW_SEAT = [
+      1, 4, 5, 8, 9, 12, 13, 16, 17, 20, 21, 24, 25, 28, 29, 32, 33, 36, 37, 40,
+      41, 44, 45, 48, 49, 52, 53, 56, 57, 60,
+    ];
+
+    const CLOSE_TO_EXIT = [1, 2, 3, 4, 29, 30, 31, 32, 57, 58, 59, 60];
+
     // Collect all available seats that match ANY selected filters
     if (filters.windowSeat)
       filteredSeats.push(
-        ...availableSeats.filter((seat) =>
-          [
-            1, 4, 5, 8, 9, 12, 13, 16, 17, 20, 21, 24, 25, 28, 29, 32, 33, 36,
-            37, 40, 41, 44, 45, 48, 49, 52, 53, 56, 57, 60,
-          ].includes(seat)
-        )
+        ...availableSeats.filter((seat) => WINDOW_SEAT.includes(seat))
       );
     if (filters.moreLegSpace)
       filteredSeats.push(
-        ...availableSeats.filter((seat) =>
-          [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 29, 30, 31, 32].includes(seat)
-        )
+        ...availableSeats.filter((seat) => MORE_LEG_SPACE_SEATS.includes(seat))
       );
     if (filters.closeToExit)
       filteredSeats.push(
-        ...availableSeats.filter((seat) =>
-          [1, 2, 3, 4, 29, 30, 31, 32, 57, 58, 59, 60].includes(seat)
-        )
+        ...availableSeats.filter((seat) => CLOSE_TO_EXIT.includes(seat))
       );
 
     // Remove duplicates from multiple filters
     filteredSeats = Array.from(new Set(filteredSeats));
 
     // First recommend all available filtered seats first
-    let recommended: number[] = filteredSeats.slice(0, tickets);
+    const recommended: number[] = filteredSeats.slice(0, tickets);
 
     // Then if there aren't any seats left based on the filters, find adjacent free seats
     if (recommended.length < tickets) {
@@ -175,7 +177,7 @@ const SeatMap: React.FC = () => {
   return (
     <Box>
       <Box mb={2}>
-        <Button variant="outlined" className="back-button" onClick={goBack}>
+        <Button variant="contained" className="back-button" onClick={goBack}>
           ← Back to Flights
         </Button>
       </Box>
@@ -186,15 +188,22 @@ const SeatMap: React.FC = () => {
         justifyContent="space-between"
         p={2}
       >
-        <Box flex={1}>
-          <Typography variant="h5">
+        <Box className="settings-box" flex={1}>
+          <Typography className="header-text" variant="h5">
             Flight from {flight.departure} to {flight.destination} on{" "}
             {flight.flightDate}
           </Typography>
 
-          <Box display="flex" alignItems="center" gap={2} mt={2}>
+          <Box
+            className="ticket-box"
+            display="flex"
+            alignItems="center"
+            gap={2}
+            mt={2}
+          >
             <TextField
               id="outlined-basic"
+              className="ticket-textfield"
               label="Number of Tickets"
               type="number"
               value={tickets}
@@ -208,8 +217,9 @@ const SeatMap: React.FC = () => {
           </Box>
 
           {/* Filters */}
-          <Box display="flex" gap={2} mt={2}>
+          <Box className="seat-filters" display="flex" gap={2} mt={2}>
             <FormControlLabel
+              className="center"
               control={
                 <Switch
                   checked={filters.windowSeat}
@@ -219,6 +229,7 @@ const SeatMap: React.FC = () => {
               label="Window Seat"
             />
             <FormControlLabel
+              className="center"
               control={
                 <Switch
                   checked={filters.moreLegSpace}
@@ -228,6 +239,7 @@ const SeatMap: React.FC = () => {
               label="More Leg Space"
             />
             <FormControlLabel
+              className="center"
               control={
                 <Switch
                   checked={filters.closeToExit}
@@ -238,9 +250,9 @@ const SeatMap: React.FC = () => {
             />
           </Box>
 
-          <Box display="flex" gap={2} mt={2}>
+          <Box className="clear-filters-box" display="flex" gap={2} mt={2}>
             <Button
-              variant="outlined"
+              variant="contained"
               className="clear-filters-btn"
               onClick={clearSeatFilters}
             >
@@ -249,23 +261,27 @@ const SeatMap: React.FC = () => {
           </Box>
 
           <Box display="flex">
-            <Button variant="contained" onClick={recommendSeats}>
+            <Button
+              variant="contained"
+              className="recommend-seats-btn"
+              onClick={recommendSeats}
+            >
               Recommend Seats
             </Button>
           </Box>
         </Box>
 
         <Box>
-          <Grid container spacing={1} mt={3} sx={{ maxWidth: "300px" }}>
+          <Grid2 className="seat-display" container spacing={1} mt={3} sx={{ maxWidth: "300px" }}>
             {Array.from({ length: seatCount / 4 }, (_, rowIndex) => {
               const baseSeat = rowIndex * 4 + 1;
 
               return (
                 <React.Fragment key={rowIndex}>
                   {/* Row 29-32 has extra leg space, so add gap */}
-                  {baseSeat === 29 && <Grid item xs={12} sx={{ height: 20 }} />}
+                  {baseSeat === 29 && <Grid2 size={12} sx={{ height: 20 }} />}
 
-                  <Grid container item spacing={1}>
+                  <Grid2 container spacing={1}>
                     {/* Left side seats */}
                     {[0, 1].map((offset) => {
                       const seat = baseSeat + offset;
@@ -275,7 +291,7 @@ const SeatMap: React.FC = () => {
                       const isBusinessClass = seat >= 1 && seat <= 12;
 
                       return (
-                        <Grid item key={seat}>
+                        <Grid2 key={seat}>
                           <Box
                             onClick={() => toggleSeatSelection(seat)}
                             sx={{
@@ -301,12 +317,12 @@ const SeatMap: React.FC = () => {
                           >
                             {seat}
                           </Box>
-                        </Grid>
+                        </Grid2>
                       );
                     })}
 
                     {/* Aisle */}
-                    <Grid item sx={{ width: 20 }} />
+                    <Grid2 sx={{ width: 20 }} />
 
                     {/* Right side seats */}
                     {[2, 3].map((offset) => {
@@ -317,7 +333,7 @@ const SeatMap: React.FC = () => {
                       const isBusinessClass = seat >= 1 && seat <= 12;
 
                       return (
-                        <Grid item key={seat}>
+                        <Grid2 key={seat}>
                           <Box
                             onClick={() => toggleSeatSelection(seat)}
                             sx={{
@@ -343,18 +359,18 @@ const SeatMap: React.FC = () => {
                           >
                             {seat}
                           </Box>
-                        </Grid>
+                        </Grid2>
                       );
                     })}
-                  </Grid>
+                  </Grid2>
                 </React.Fragment>
               );
             })}
-          </Grid>
+          </Grid2>
         </Box>
 
         {/* Selected seats & total price section */}
-        <Paper sx={{ width: 250, p: 2, ml: 3 }}>
+        <Paper className="paper-price" sx={{ width: 250, p: 2, ml: 3 }}>
           <Typography variant="h6">Selected Seats</Typography>
           {selectedSeats.length === 0 ? (
             <Typography>No seats selected</Typography>
