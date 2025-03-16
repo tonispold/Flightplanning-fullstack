@@ -21,7 +21,7 @@ This is a **full-stack flight planning app** built with:
 - cd Flightplanning-fullstack
 
 **3. Run the Application**
-- docker-compose up --build
+- docker-compose up --build -d
 
 **This will:**
 - Start a **MySQL database** (flight_db)
