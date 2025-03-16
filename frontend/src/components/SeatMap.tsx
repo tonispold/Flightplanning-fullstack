@@ -87,59 +87,105 @@ const SeatMap: React.FC = () => {
       return;
     }
 
-    let filteredSeats: number[] = [];
+    // If no filters are applied, recommend seats that are closest together
+    const noFiltersApplied = Object.values(filters).every((value) => !value);
 
-    const MORE_LEG_SPACE_SEATS = [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 29, 30, 31, 32,
-    ];
-
-    const WINDOW_SEAT = [
-      1, 4, 5, 8, 9, 12, 13, 16, 17, 20, 21, 24, 25, 28, 29, 32, 33, 36, 37, 40,
-      41, 44, 45, 48, 49, 52, 53, 56, 57, 60,
-    ];
-
-    const CLOSE_TO_EXIT = [1, 2, 3, 4, 29, 30, 31, 32, 57, 58, 59, 60];
-
-    // Collect all available seats that match ANY selected filters
-    if (filters.windowSeat)
-      filteredSeats.push(
-        ...availableSeats.filter((seat) => WINDOW_SEAT.includes(seat))
-      );
-    if (filters.moreLegSpace)
-      filteredSeats.push(
-        ...availableSeats.filter((seat) => MORE_LEG_SPACE_SEATS.includes(seat))
-      );
-    if (filters.closeToExit)
-      filteredSeats.push(
-        ...availableSeats.filter((seat) => CLOSE_TO_EXIT.includes(seat))
-      );
-
-    // Remove duplicates from multiple filters
-    filteredSeats = Array.from(new Set(filteredSeats));
-
-    // First recommend all available filtered seats first
-    const recommended: number[] = filteredSeats.slice(0, tickets);
-
-    // Then if there aren't any seats left based on the filters, find adjacent free seats
-    if (recommended.length < tickets) {
-      const remainingSeats = availableSeats.filter(
-        (seat) => !recommended.includes(seat)
-      );
+    if (noFiltersApplied) {
       let bestGroup: number[] = [];
-      for (let i = 0; i <= remainingSeats.length - tickets; i++) {
-        const group = remainingSeats.slice(i, i + tickets);
-        if (group[group.length - 1] - group[0] === tickets - 1) {
+
+      // Loop through available seats to find the best consecutive group
+      for (let i = 0; i <= availableSeats.length - tickets; i++) {
+        const group = availableSeats.slice(i, i + tickets);
+
+        // Ensure seats are sequential (handle aisle skips)
+        let isSequential = true;
+        for (let j = 1; j < group.length; j++) {
+          if (group[j] !== group[j - 1] + 1) {
+            isSequential = false;
+            break;
+          }
+        }
+
+        if (isSequential) {
           bestGroup = group;
           break;
         }
       }
-      if (bestGroup.length > 0) {
-        recommended.push(...bestGroup);
-      } else {
-        const remainingNeeded = tickets - recommended.length;
-        const remainingFreeSeats = remainingSeats.slice(0, remainingNeeded);
-        recommended.push(...remainingFreeSeats);
+
+      // If no perfect row is found, pick closest grouped seats
+      if (bestGroup.length === 0) {
+        bestGroup = availableSeats.slice(0, tickets);
       }
+
+      setRecommendedSeats(bestGroup);
+      setSelectedSeats([]); // Reset manually selected seats
+      setError(null);
+      return;
+    }
+
+    // If filters are applied, keep the existing filter-based recommendation logic
+    const MORE_LEG_SPACE_SEATS = [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 29, 30, 31, 32,
+    ];
+    const WINDOW_SEAT = [
+      1, 4, 5, 8, 9, 12, 13, 16, 17, 20, 21, 24, 25, 28, 29, 32, 33, 36, 37, 40,
+      41, 44, 45, 48, 49, 52, 53, 56, 57, 60,
+    ];
+    const CLOSE_TO_EXIT = [1, 2, 3, 4, 29, 30, 31, 32, 57, 58, 59, 60];
+
+    const matchesFilterCount = (seat: number): number => {
+      let count = 0;
+      if (filters.windowSeat && WINDOW_SEAT.includes(seat)) count++;
+      if (filters.moreLegSpace && MORE_LEG_SPACE_SEATS.includes(seat)) count++;
+      if (filters.closeToExit && CLOSE_TO_EXIT.includes(seat)) count++;
+      return count;
+    };
+
+    // Categorize seats by how many filters they match
+    const seatsMatchingThreeFilters: number[] = [];
+    const seatsMatchingTwoFilters: number[] = [];
+    const seatsMatchingOneFilter: number[] = [];
+
+    availableSeats.forEach((seat) => {
+      const filterMatchCount = matchesFilterCount(seat);
+      if (filterMatchCount === 3) seatsMatchingThreeFilters.push(seat);
+      else if (filterMatchCount === 2) seatsMatchingTwoFilters.push(seat);
+      else if (filterMatchCount === 1) seatsMatchingOneFilter.push(seat);
+    });
+
+    let recommended: number[] = [];
+
+    // Prioritize seats that match all three filters
+    recommended.push(...seatsMatchingThreeFilters.slice(0, tickets));
+
+    // If not enough, add seats that match exactly two filters
+    if (recommended.length < tickets) {
+      const remainingSeats = seatsMatchingTwoFilters.filter(
+        (seat) => !recommended.includes(seat)
+      );
+      recommended.push(
+        ...remainingSeats.slice(0, tickets - recommended.length)
+      );
+    }
+
+    // If not enough, add seats that match at least one filter
+    if (recommended.length < tickets) {
+      const remainingSeats = seatsMatchingOneFilter.filter(
+        (seat) => !recommended.includes(seat)
+      );
+      recommended.push(
+        ...remainingSeats.slice(0, tickets - recommended.length)
+      );
+    }
+
+    // If still not enough, add any free seat in ascending order
+    if (recommended.length < tickets) {
+      const remainingSeats = availableSeats.filter(
+        (seat) => !recommended.includes(seat)
+      );
+      recommended.push(
+        ...remainingSeats.slice(0, tickets - recommended.length)
+      );
     }
 
     setRecommendedSeats(recommended);
@@ -272,7 +318,13 @@ const SeatMap: React.FC = () => {
         </Box>
 
         <Box>
-          <Grid2 className="seat-display" container spacing={1} mt={3} sx={{ maxWidth: "300px" }}>
+          <Grid2
+            className="seat-display"
+            container
+            spacing={1}
+            mt={3}
+            sx={{ maxWidth: "300px" }}
+          >
             {Array.from({ length: seatCount / 4 }, (_, rowIndex) => {
               const baseSeat = rowIndex * 4 + 1;
 
